@@ -62,7 +62,65 @@ int main(int argc, char* argv[])
 	}
 	else
 		printf("listen() is OK, waiting for connections...\n");
-	
+
+	// Create a temporary SOCKET object called AcceptSocket for accepting connections.
+	SOCKET AcceptSocket;
+
+	// Create a continuous loop that checks for connections requests. If a connection
+	// request occurs, call the accept function to handle the request.
+	printf("Server: Waiting for a client to connect...\n");
+	printf("***Hint: Server is ready...run your client program...***\n");
+	// Do some verification...
+	int acc = 1;
+	while (acc)
+	{
+		AcceptSocket = SOCKET_ERROR;
+		while (AcceptSocket == SOCKET_ERROR)
+		{
+			AcceptSocket = accept(m_socket, NULL, NULL);
+		}
+		// else, accept the connection...
+		// When the client connection has been accepted, transfer control from the
+		// temporary socket to the original socket and stop checking for new connections.
+		printf("Server: Client Connected!\n");
+		m_socket = AcceptSocket;
+		acc = 0;
+	}
+
+	int bytesSent;
+	int bytesRecv = SOCKET_ERROR;
+	char sendbuf[200] = "This string is a test data from server";
+
+	// initialize to empty data...
+	char recvbuf[200] = "";
+
+	// Send some test string to client...
+	printf("Server: Sending some test data to client...\n");
+	bytesSent = send(m_socket, sendbuf, strlen(sendbuf), 0);
+
+	if (bytesSent == SOCKET_ERROR) {
+
+		printf("Server: send() error %ld.\n", WSAGetLastError());
+
+	}
+	else {
+		printf("Server: send() is OK.\n");
+		printf("Server: Bytes Sent: %ld.\n", bytesSent);
+	}
+
+	// Receives some test string from client...and client
+	bytesRecv = recv(m_socket, recvbuf, 200, 0);
+
+	if (bytesRecv == SOCKET_ERROR) {
+		printf("Server: recv() error %ld.\n", WSAGetLastError());
+
+	}
+	else {
+		printf("Server: recv() is OK.\n");
+		printf("Server: Received data is: \"%s\"\n", recvbuf);
+		printf("Server: Bytes received: %ld.\n", bytesRecv);
+	}
+
 	closesocket(m_socket);
 	WSACleanup();
 
